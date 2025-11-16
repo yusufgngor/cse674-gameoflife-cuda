@@ -3,9 +3,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
+#include <chrono>
 
 #define GRID_WIDTH 80
-#define GRID_HEIGHT 40
+#define GRID_HEIGHT 200
 #define BLOCK_SIZE 16
 
 // CUDA kernel for Game of Life with custom rules
@@ -90,10 +91,12 @@ public:
         timeStep = 0;
     }
     
-    void step(int steps = 1) {
+    double step(int steps = 1) {
         dim3 blockDim(BLOCK_SIZE, BLOCK_SIZE);
         dim3 gridDim((width + BLOCK_SIZE - 1) / BLOCK_SIZE, 
                      (height + BLOCK_SIZE - 1) / BLOCK_SIZE);
+        
+        auto start = std::chrono::high_resolution_clock::now();
         
         for (int i = 0; i < steps; i++) {
             // Launch kernel
@@ -107,9 +110,15 @@ public:
             
             timeStep++;
         }
+        
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed = end - start;
+        
+        return elapsed.count();
     }
     
     void display() {
+        
         // Copy current grid from device to host
         cudaMemcpy(h_grid, d_currentGrid, width * height * sizeof(int), 
                                    cudaMemcpyDeviceToHost);
@@ -189,8 +198,9 @@ int main() {
         
         if (input.empty()) {
             // Advance 1 step
-            game.step(1);
+            double elapsed = game.step(1);
             game.display();
+            std::cout << "Execution time: " << elapsed << " ms\n";
         }
         else if (input == "q" || input == "quit") {
             std::cout << "Exiting...\n";
@@ -211,8 +221,10 @@ int main() {
                 int steps = std::stoi(input);
                 if (steps > 0 && steps <= 10000) {
                     std::cout << "Advancing " << steps << " steps...\n";
-                    game.step(steps);
+                    double elapsed = game.step(steps);
                     game.display();
+                    std::cout << "Execution time: " << elapsed << " ms";
+                    std::cout << " (" << (elapsed / steps) << " ms/step)\n";
                 } else {
                     std::cout << "Please enter a number between 1 and 10000.\n";
                 }

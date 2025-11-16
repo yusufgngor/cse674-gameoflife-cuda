@@ -72,3 +72,5 @@ The display shows:
 - Population percentage
 
 Enjoy watching the patterns evolve!
+
+to watch gpu usage "sudo nvidia-smi dmon"
