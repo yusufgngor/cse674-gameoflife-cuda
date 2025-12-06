@@ -1,5 +1,6 @@
 # Compiled executables
 game_of_life
+game_of_life_openmp
 
 # Object files
 *.o

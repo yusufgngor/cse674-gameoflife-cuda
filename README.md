@@ -1,6 +1,6 @@
-# CUDA Game of Life
+# Game of Life - CUDA and OpenMP Implementations
 
-A GPU-accelerated Conway's Game of Life implementation with custom rules.
+Parallel implementations of Conway's Game of Life with custom rules using CUDA (GPU) and OpenMP (CPU multi-threading).
 
 ## Custom Rules
 
@@ -10,30 +10,66 @@ A GPU-accelerated Conway's Game of Life implementation with custom rules.
 
 ## Requirements
 
+### CUDA Version
 - NVIDIA GPU with CUDA support
 - CUDA Toolkit installed
-- C++ compiler
+
+### OpenMP Version
+- C++ compiler with OpenMP support (g++, clang++)
+- Multi-core CPU
 
 ## Compilation
 
+### Build both versions:
 ```bash
 make
 ```
 
-Or compile manually:
+### Build only CUDA version:
 ```bash
-nvcc -O2 -arch=sm_50 main.cpp -o game_of_life
+make cuda
+```
+
+### Build only OpenMP version:
+```bash
+make openmp
+```
+
+### Or compile manually:
+
+**CUDA version:**
+```bash
+nvcc -O2 -arch=sm_50 main.cu -o game_of_life
+```
+
+**OpenMP version:**
+```bash
+g++ -O2 -fopenmp -std=c++11 main_openmp.cpp -o game_of_life_openmp
 ```
 
 ## Running
 
+### Run CUDA version:
 ```bash
 make run
 ```
-
-Or run directly:
+or
 ```bash
 ./game_of_life
+```
+
+### Run OpenMP version:
+```bash
+make run-openmp
+```
+or
+```bash
+./game_of_life_openmp
+```
+
+You can set the number of OpenMP threads with:
+```bash
+OMP_NUM_THREADS=8 ./game_of_life_openmp
 ```
 
 ## Controls
@@ -46,8 +82,12 @@ Or run directly:
 
 ## Grid Settings
 
-- Grid size: 80x40 cells
-- Initial population density: ~30% (randomly generated)
+- Grid size: 80x200 cells
+- Initial population density: ~60% (randomly generated)
+
+## Performance Comparison
+
+Both implementations use the same custom rules and grid size. The CUDA version parallelizes computation on the GPU, while the OpenMP version uses CPU multi-threading. You can compare their performance by running the same number of steps on each version.
 - Toroidal topology (edges wrap around)
 
 ## Examples
